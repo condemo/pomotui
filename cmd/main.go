@@ -27,7 +27,7 @@ func NewPomotui() Pomotui {
 
 func (m Pomotui) Init() tea.Cmd {
 	m.views[home] = views.NewHome()
-	return nil
+	return m.views[m.currentView].Init()
 }
 
 func (m Pomotui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
