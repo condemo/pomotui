@@ -9,6 +9,7 @@ import (
 	"github.com/charmbracelet/bubbles/v2/timer"
 	tea "github.com/charmbracelet/bubbletea/v2"
 	"github.com/condemo/pomotui/keymaps"
+	"github.com/condemo/pomotui/messages"
 )
 
 // TODO: Crear un módulo de configuración para hacer dinámico todo esto
@@ -51,8 +52,10 @@ func (m HomeView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keys.Reset):
 			m.timer.Timeout = timeout
 		case key.Matches(msg, m.keys.Help):
-			m.help.ShowAll = !m.help.ShowAll
+			// TODO: Reactivar `FullHelp` cuando haga falta
 		}
+	case messages.ViewChanged:
+		return m, m.timer.Stop()
 	}
 	return m, cmd
 }

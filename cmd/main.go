@@ -7,20 +7,14 @@ import (
 	"github.com/charmbracelet/bubbles/v2/key"
 	tea "github.com/charmbracelet/bubbletea/v2"
 	"github.com/condemo/pomotui/keymaps"
+	"github.com/condemo/pomotui/messages"
 	"github.com/condemo/pomotui/views"
-)
-
-type view uint8
-
-const (
-	home view = iota
-	config
 )
 
 type Pomotui struct {
 	keys        keymaps.CoreKeyMap
 	views       []tea.Model
-	currentView view
+	currentView views.View
 	help        help.Model
 	quitting    bool
 }
@@ -34,8 +28,8 @@ func NewPomotui() Pomotui {
 }
 
 func (m Pomotui) Init() tea.Cmd {
-	m.views[home] = views.NewHomeView()
-	m.views[config] = views.NewConfig()
+	m.views[views.Home] = views.NewHomeView()
+	m.views[views.Config] = views.NewConfig()
 	return m.views[m.currentView].Init()
 }
 
@@ -50,12 +44,13 @@ func (m Pomotui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keys.Config):
 			m.keys.Home.SetEnabled(true)
 			m.keys.Config.SetEnabled(false)
-			m.currentView = config
+			m.currentView = views.Config
+			return m, messages.ChangeView
 		case key.Matches(msg, m.keys.Home):
 			m.keys.Home.SetEnabled(false)
 			m.keys.Config.SetEnabled(true)
-			m.currentView = home
-
+			m.currentView = views.Home
+			return m, messages.ChangeView
 		case key.Matches(msg, m.keys.Quit):
 			m.quitting = true
 			return m, tea.Quit

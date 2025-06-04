@@ -1,6 +1,8 @@
 package views
 
 import (
+	"strings"
+
 	tea "github.com/charmbracelet/bubbletea/v2"
 	"github.com/condemo/pomotui/keymaps"
 )
@@ -26,5 +28,5 @@ func (m ConfigView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m ConfigView) View() string {
-	return "ConfigView"
+	return "ConfigView" + strings.Repeat("\n", 3)
 }
