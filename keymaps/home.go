@@ -32,8 +32,8 @@ func NewHomeKeyMap() HomeKeyMap {
 			key.WithHelp("?", "help"),
 		),
 		Quit: key.NewBinding(
-			key.WithKeys("ctrl+c"),
-			key.WithHelp("ctrl+c", "exit"),
+			key.WithKeys("q", "ctrl+c"),
+			key.WithHelp("q/ctrl+c", "exit"),
 		),
 	}
 }
