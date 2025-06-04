@@ -14,26 +14,26 @@ import (
 // TODO: Crear un módulo de configuración para hacer dinámico todo esto
 const timeout = time.Minute * 30
 
-type Home struct {
+type HomeView struct {
 	keys  keymaps.HomeKeyMap
 	help  help.Model
 	timer timer.Model
 }
 
-func NewHome() Home {
-	return Home{
+func NewHomeView() HomeView {
+	return HomeView{
 		keys:  keymaps.NewHomeKeyMap(),
 		help:  help.New(),
 		timer: timer.New(timeout, timer.WithInterval(time.Millisecond)),
 	}
 }
 
-func (m Home) Init() tea.Cmd {
+func (m HomeView) Init() tea.Cmd {
 	m.timer.Init()
 	return m.timer.Stop()
 }
 
-func (m Home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m HomeView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
@@ -57,7 +57,7 @@ func (m Home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m Home) View() string {
+func (m HomeView) View() string {
 	return strings.Repeat("\n", 2) + m.timer.View() +
 		strings.Repeat("\n", 3) + m.help.View(m.keys)
 }

@@ -33,7 +33,7 @@ func NewPomotui() Pomotui {
 }
 
 func (m Pomotui) Init() tea.Cmd {
-	m.views[home] = views.NewHome()
+	m.views[home] = views.NewHomeView()
 	return m.views[m.currentView].Init()
 }
 
