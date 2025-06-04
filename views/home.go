@@ -46,8 +46,6 @@ func (m Home) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.keys.Start.SetEnabled(!m.timer.Running())
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, m.keys.Quit):
-			return m, tea.Quit
 		case key.Matches(msg, m.keys.Start, m.keys.Pause):
 			return m, m.timer.Toggle()
 		case key.Matches(msg, m.keys.Reset):

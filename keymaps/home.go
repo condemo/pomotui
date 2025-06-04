@@ -9,7 +9,6 @@ type HomeKeyMap struct {
 	Pause key.Binding
 	Reset key.Binding
 	Help  key.Binding
-	Quit  key.Binding
 }
 
 func NewHomeKeyMap() HomeKeyMap {
@@ -31,10 +30,6 @@ func NewHomeKeyMap() HomeKeyMap {
 			key.WithKeys("?"),
 			key.WithHelp("?", "help"),
 		),
-		Quit: key.NewBinding(
-			key.WithKeys("q", "ctrl+c"),
-			key.WithHelp("q/ctrl+c", "exit"),
-		),
 	}
 }
 
@@ -45,8 +40,5 @@ func (k HomeKeyMap) ShortHelp() []key.Binding {
 }
 
 func (k HomeKeyMap) FullHelp() [][]key.Binding {
-	return [][]key.Binding{
-		{k.Start, k.Pause, k.Help},
-		{k.Reset, k.Quit},
-	}
+	return [][]key.Binding{}
 }
