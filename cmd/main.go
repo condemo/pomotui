@@ -14,6 +14,7 @@ type view uint8
 
 const (
 	home view = iota
+	config
 )
 
 type Pomotui struct {
@@ -34,6 +35,7 @@ func NewPomotui() Pomotui {
 
 func (m Pomotui) Init() tea.Cmd {
 	m.views[home] = views.NewHomeView()
+	m.views[config] = views.NewConfig()
 	return m.views[m.currentView].Init()
 }
 
@@ -45,6 +47,15 @@ func (m Pomotui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.help.Width = msg.Width
 	case tea.KeyMsg:
 		switch {
+		case key.Matches(msg, m.keys.Config):
+			m.keys.Home.SetEnabled(true)
+			m.keys.Config.SetEnabled(false)
+			m.currentView = config
+		case key.Matches(msg, m.keys.Home):
+			m.keys.Home.SetEnabled(false)
+			m.keys.Config.SetEnabled(true)
+			m.currentView = home
+
 		case key.Matches(msg, m.keys.Quit):
 			m.quitting = true
 			return m, tea.Quit
