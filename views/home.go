@@ -1,6 +1,7 @@
 package views
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -14,6 +15,8 @@ import (
 
 // TODO: Crear un módulo de configuración para hacer dinámico todo esto
 const timeout = time.Minute * 30
+const shortTimeout = time.Minute * 5
+const longTimeout = time.Minute * 15
 
 type timerMode string
 
@@ -71,8 +74,10 @@ func (m HomeView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m HomeView) View() string {
+	mode := fmt.Sprintf("[ %s ]", string(m.timerMode))
+
 	return strings.Repeat("\n", 2) +
 		"\t" + m.timer.View() +
-		"\n\t" + string(m.timerMode) +
+		"\n\t" + mode +
 		strings.Repeat("\n", 3) + m.help.View(m.keys)
 }
