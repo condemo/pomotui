@@ -32,7 +32,7 @@ const (
 // TODO: debería ser todo dinámico
 const (
 	incPercent = .0005555
-	maxWidth   = 25
+	maxWidth   = 20
 )
 
 type HomeView struct {
@@ -50,7 +50,6 @@ func NewHomeView() HomeView {
 		timerMode: work,
 		timer:     timer.New(timeout, timer.WithInterval(time.Second)),
 		timerProgress: progress.New(
-			progress.WithoutPercentage(),
 			progress.WithDefaultGradient(),
 		),
 	}
