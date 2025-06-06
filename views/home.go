@@ -2,7 +2,6 @@ package views
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/charmbracelet/bubbles/v2/help"
@@ -12,6 +11,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea/v2"
 	"github.com/condemo/pomotui/keymaps"
 	"github.com/condemo/pomotui/messages"
+	"github.com/condemo/pomotui/style"
 )
 
 // TODO: Crear un módulo de configuración para hacer dinámico todo esto
@@ -34,6 +34,8 @@ const (
 	incPercent = .0005555
 	maxWidth   = 20
 )
+
+var currentColor = style.MainColor
 
 type HomeView struct {
 	keys          keymaps.HomeKeyMap
@@ -71,8 +73,15 @@ func (m HomeView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Batch(cmd, pc)
 	case timer.StartStopMsg:
 		m.timer, cmd = m.timer.Update(msg)
-		m.keys.Pause.SetEnabled(m.timer.Running())
-		m.keys.Start.SetEnabled(!m.timer.Running())
+		if m.timer.Running() {
+			m.keys.Pause.SetEnabled(true)
+			m.keys.Start.SetEnabled(false)
+			currentColor = style.WorkColor
+		} else {
+			m.keys.Pause.SetEnabled(true)
+			m.keys.Start.SetEnabled(false)
+			currentColor = style.BreakColor
+		}
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keys.Start, m.keys.Pause):
@@ -104,9 +113,9 @@ func (m HomeView) View() string {
 	mode := fmt.Sprintf("[ %s ]", string(m.timerMode))
 	pb := m.timerProgress.View()
 
-	return strings.Repeat("\n", 2) +
-		"\n\t" + mode +
-		"\n\t" + m.timer.View() +
-		"\n\t" + pb +
-		strings.Repeat("\n", 3) + m.help.View(m.keys)
+	v := style.MainContainer.BorderForeground(currentColor).Render(
+		mode, m.timer.View(), pb, " | ",
+		m.help.View(m.keys))
+
+	return v
 }
