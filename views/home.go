@@ -113,9 +113,7 @@ func (m HomeView) View() string {
 	mode := fmt.Sprintf("[ %s ]", string(m.timerMode))
 	pb := m.timerProgress.View()
 
-	v := style.MainContainer.BorderForeground(currentColor).Render(
-		mode, m.timer.View(), pb, " | ",
-		m.help.View(m.keys))
-
-	return v
+	return style.MainContainer.BorderForeground(currentColor).Render(
+		mode, m.timer.View(), pb, m.help.View(m.keys),
+	)
 }

@@ -5,12 +5,12 @@ go 1.24.3
 require (
 	github.com/charmbracelet/bubbles/v2 v2.0.0-beta.1
 	github.com/charmbracelet/bubbletea/v2 v2.0.0-beta.3
+	github.com/charmbracelet/lipgloss/v2 v2.0.0-beta.1
 )
 
 require (
 	github.com/charmbracelet/colorprofile v0.3.1 // indirect
 	github.com/charmbracelet/harmonica v0.2.0 // indirect
-	github.com/charmbracelet/lipgloss/v2 v2.0.0-beta.1 // indirect
 	github.com/charmbracelet/x/ansi v0.8.0 // indirect
 	github.com/charmbracelet/x/cellbuf v0.0.14-0.20250501183327-ad3bc78c6a81 // indirect
 	github.com/charmbracelet/x/input v0.3.5-0.20250424101541-abb4d9a9b197 // indirect
