@@ -16,7 +16,7 @@ import (
 
 // TODO: Crear un módulo de configuración para hacer dinámico todo esto
 const (
-	timeout      = time.Minute * 30
+	timeout      = time.Minute * 1
 	shortTimeout = time.Minute * 5
 	longTimeout  = time.Minute * 15
 )
@@ -71,17 +71,13 @@ func (m HomeView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.timer, cmd = m.timer.Update(msg)
 		pc = m.timerProgress.IncrPercent(incPercent)
 		return m, tea.Batch(cmd, pc)
+
 	case timer.StartStopMsg:
 		m.timer, cmd = m.timer.Update(msg)
-		if m.timer.Running() {
-			m.keys.Pause.SetEnabled(true)
-			m.keys.Start.SetEnabled(false)
-			currentColor = style.WorkColor
-		} else {
-			m.keys.Pause.SetEnabled(true)
-			m.keys.Start.SetEnabled(false)
-			currentColor = style.BreakColor
-		}
+		m.keys.Pause.SetEnabled(m.timer.Running())
+		m.keys.Start.SetEnabled(!m.timer.Running())
+		m.swapColor()
+
 	case timer.TimeoutMsg:
 		cmd1 := m.timer.Stop()
 		cmd2 := m.timerProgress.SetPercent(0)
@@ -122,4 +118,20 @@ func (m HomeView) View() string {
 	return style.MainContainer.BorderForeground(currentColor).Render(
 		mode, m.timer.View(), pb, m.help.View(m.keys),
 	)
+}
+
+func (m *HomeView) stop() tea.Cmd {
+	var cmd tea.Cmd
+	// TODO: mover funcionalidad aquí
+
+	return cmd
+}
+
+func (m *HomeView) swapColor() tea.Cmd {
+	if m.timer.Running() {
+		currentColor = style.WorkColor
+	} else {
+		currentColor = style.MainColor
+	}
+	return nil
 }
