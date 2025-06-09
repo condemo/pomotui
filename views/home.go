@@ -29,7 +29,7 @@ const (
 	longBreak  timerMode = "Long Break"
 )
 
-// TODO: debería ser todo dinámico
+// TODO: debería ser todo dinámico, el `incPercent` tiene que ser calculado
 const (
 	incPercent = .0005555
 	maxWidth   = 20
@@ -82,6 +82,12 @@ func (m HomeView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.keys.Start.SetEnabled(false)
 			currentColor = style.BreakColor
 		}
+	case timer.TimeoutMsg:
+		cmd1 := m.timer.Stop()
+		cmd2 := m.timerProgress.SetPercent(0)
+		m.timer.Timeout = timeout
+		return m, tea.Batch(cmd1, cmd2)
+
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keys.Start, m.keys.Pause):
