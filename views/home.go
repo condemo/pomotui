@@ -74,9 +74,7 @@ func (m HomeView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case timer.StartStopMsg:
 		m.timer, cmd = m.timer.Update(msg)
-		m.keys.Pause.SetEnabled(m.timer.Running())
-		m.keys.Start.SetEnabled(!m.timer.Running())
-		m.swapColor()
+		m.stop()
 
 	case timer.TimeoutMsg:
 		cmd1 := m.timer.Stop()
@@ -91,8 +89,6 @@ func (m HomeView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keys.Reset):
 			m.timer.Timeout = timeout
 			return m, m.timerProgress.SetPercent(0)
-		case key.Matches(msg, m.keys.Help):
-			// TODO: Reactivar `FullHelp` cuando haga falta
 		}
 	case tea.WindowSizeMsg:
 		m.timerProgress.SetWidth(msg.Width / 3)
@@ -116,22 +112,22 @@ func (m HomeView) View() string {
 	pb := m.timerProgress.View()
 
 	return style.MainContainer.BorderForeground(currentColor).Render(
-		mode, m.timer.View(), pb, m.help.View(m.keys),
+		mode, m.timer.View(), pb, "\t·\t", m.help.View(m.keys),
 	)
 }
 
 func (m *HomeView) stop() tea.Cmd {
-	var cmd tea.Cmd
 	// TODO: mover funcionalidad aquí
-
-	return cmd
-}
-
-func (m *HomeView) swapColor() tea.Cmd {
+	// m.keys.Pause.SetEnabled(m.timer.Running())
+	// m.keys.Start.SetEnabled(!m.timer.Running())
 	if m.timer.Running() {
 		currentColor = style.WorkColor
+		m.keys.Pause.SetEnabled(true)
+		m.keys.Start.SetEnabled(false)
 	} else {
 		currentColor = style.MainColor
+		m.keys.Pause.SetEnabled(false)
+		m.keys.Start.SetEnabled(true)
 	}
 	return nil
 }

@@ -8,7 +8,6 @@ type HomeKeyMap struct {
 	Start key.Binding
 	Pause key.Binding
 	Reset key.Binding
-	Help  key.Binding
 }
 
 func NewHomeKeyMap() HomeKeyMap {
@@ -26,16 +25,12 @@ func NewHomeKeyMap() HomeKeyMap {
 			key.WithKeys("esc", "r"),
 			key.WithHelp("esc/r", "reset"),
 		),
-		Help: key.NewBinding(
-			key.WithKeys("?"),
-			key.WithHelp("?", "help"),
-		),
 	}
 }
 
 func (k HomeKeyMap) ShortHelp() []key.Binding {
 	return []key.Binding{
-		k.Start, k.Pause, k.Reset, k.Help,
+		k.Start, k.Pause, k.Reset,
 	}
 }
 
