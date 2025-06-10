@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 
-	"github.com/charmbracelet/bubbles/v2/help"
-	"github.com/charmbracelet/bubbles/v2/key"
-	tea "github.com/charmbracelet/bubbletea/v2"
-	"github.com/charmbracelet/lipgloss/v2"
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/condemo/pomotui/keymaps"
 	"github.com/condemo/pomotui/messages"
 	"github.com/condemo/pomotui/views"
@@ -65,14 +65,8 @@ func (m Pomotui) View() string {
 		return "Bye!"
 	}
 
-	if view, ok := m.views[m.currentView].(tea.ViewModel); ok {
-		// return view.View() +
-		// 	"\n" +
-		// 	m.help.View(m.keys)
-		return lipgloss.JoinVertical(lipgloss.Center,
-			view.View(), m.help.View(m.keys))
-	}
-	return "error loading initial view"
+	return lipgloss.JoinVertical(lipgloss.Center,
+		m.views[m.currentView].View(), m.help.View(m.keys))
 }
 
 func main() {

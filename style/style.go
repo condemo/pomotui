@@ -1,6 +1,6 @@
 package style
 
-import "github.com/charmbracelet/lipgloss/v2"
+import "github.com/charmbracelet/lipgloss"
 
 var MainContainer = lipgloss.NewStyle().
 	AlignHorizontal(lipgloss.Center).

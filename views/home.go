@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/charmbracelet/bubbles/v2/help"
-	"github.com/charmbracelet/bubbles/v2/key"
-	"github.com/charmbracelet/bubbles/v2/progress"
-	"github.com/charmbracelet/bubbles/v2/timer"
-	tea "github.com/charmbracelet/bubbletea/v2"
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/progress"
+	"github.com/charmbracelet/bubbles/timer"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/condemo/pomotui/config"
 	"github.com/condemo/pomotui/keymaps"
 	"github.com/condemo/pomotui/messages"
 	"github.com/condemo/pomotui/style"
@@ -50,7 +51,7 @@ func NewHomeView() HomeView {
 		keys:      keymaps.NewHomeKeyMap(),
 		help:      help.New(),
 		timerMode: work,
-		timer:     timer.New(timeout, timer.WithInterval(time.Second)),
+		timer:     timer.New(config.TimerConfig.Work),
 		timerProgress: progress.New(
 			progress.WithDefaultGradient(),
 		),
@@ -91,14 +92,12 @@ func (m HomeView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, m.timerProgress.SetPercent(0)
 		}
 	case tea.WindowSizeMsg:
-		m.timerProgress.SetWidth(msg.Width / 3)
-		if m.timerProgress.Width() > maxWidth {
-			m.timerProgress.SetWidth(maxWidth)
-		}
+		m.timerProgress.Width = min(msg.Width/3, maxWidth)
 		return m, nil
 
 	case progress.FrameMsg:
-		m.timerProgress, cmd = m.timerProgress.Update(msg)
+		pm, cmd := m.timerProgress.Update(msg)
+		m.timerProgress = pm.(progress.Model)
 		return m, cmd
 
 	case messages.ViewChanged:
