@@ -1,6 +1,7 @@
 package views
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -46,7 +47,7 @@ func NewConfig() ConfigView {
 						huh.NewOption("25m", time.Minute*25),
 					).Key("long"),
 				huh.NewConfirm().
-					Title("Ara you sure?").Affirmative("yes!").Negative("no.").
+					Title("Are you sure?").Affirmative("yes!").Negative("no.").
 					Value(&confirmed),
 			).WithTheme(huh.ThemeCatppuccin()),
 		),
@@ -68,5 +69,14 @@ func (m ConfigView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m ConfigView) View() string {
+	work := m.form.Get("work")
+	short := m.form.Get("short")
+	long := m.form.Get("long")
+
+	currentSelections := fmt.Sprintf("work - %s | short - %s | long - %s", work, short, long)
+
+	if m.form.State == huh.StateCompleted {
+		return "ConfigView" + strings.Repeat("\n", 3) + currentSelections
+	}
 	return "ConfigView" + strings.Repeat("\n", 3) + m.form.View() + strings.Repeat("\n", 3)
 }
