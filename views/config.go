@@ -7,7 +7,9 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/condemo/pomotui/keymaps"
+	"github.com/condemo/pomotui/style"
 )
 
 type ConfigView struct {
@@ -38,6 +40,8 @@ func NewConfig() ConfigView {
 						huh.NewOption("5m", time.Minute*5),
 						huh.NewOption("6m", time.Minute*6),
 					).Key("short"),
+			),
+			huh.NewGroup(
 				huh.NewSelect[time.Duration]().
 					Title("Long Break").
 					Options(
@@ -49,8 +53,8 @@ func NewConfig() ConfigView {
 				huh.NewConfirm().
 					Title("Are you sure?").Affirmative("yes!").Negative("no.").
 					Value(&confirmed),
-			).WithTheme(huh.ThemeCatppuccin()),
-		),
+			),
+		).WithLayout(huh.LayoutColumns(2)).WithWidth(50),
 	}
 }
 
@@ -78,5 +82,7 @@ func (m ConfigView) View() string {
 	if m.form.State == huh.StateCompleted {
 		return "ConfigView" + strings.Repeat("\n", 3) + currentSelections
 	}
-	return "ConfigView" + strings.Repeat("\n", 3) + m.form.View() + strings.Repeat("\n", 3)
+
+	view := lipgloss.JoinVertical(lipgloss.Center, "Config", m.form.View())
+	return style.MainContainer.Render(view)
 }
