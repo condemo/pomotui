@@ -40,7 +40,7 @@ func NewConfig() ConfigView {
 						huh.NewOption("5m", time.Minute*5),
 						huh.NewOption("6m", time.Minute*6),
 					).Key("short"),
-			),
+			).WithWidth(30),
 			huh.NewGroup(
 				huh.NewSelect[time.Duration]().
 					Title("Long Break").
@@ -53,7 +53,7 @@ func NewConfig() ConfigView {
 				huh.NewConfirm().
 					Title("Are you sure?").Affirmative("yes!").Negative("no.").
 					Value(&confirmed),
-			),
+			).WithWidth(20),
 		).WithLayout(huh.LayoutColumns(2)).WithWidth(50),
 	}
 }
@@ -80,9 +80,9 @@ func (m ConfigView) View() string {
 	currentSelections := fmt.Sprintf("work - %s | short - %s | long - %s", work, short, long)
 
 	if m.form.State == huh.StateCompleted {
-		return "ConfigView" + strings.Repeat("\n", 3) + currentSelections
+		return "Config" + strings.Repeat("\n", 3) + currentSelections
 	}
 
 	view := lipgloss.JoinVertical(lipgloss.Center, "Config", m.form.View())
-	return style.MainContainer.Render(view)
+	return style.MainContainer.Padding(1, 10, 1, 15).Render(view)
 }
