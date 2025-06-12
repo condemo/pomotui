@@ -1,6 +1,19 @@
 package config
 
-import "time"
+import (
+	"encoding/json"
+	"log"
+	"os"
+	"path"
+	"time"
+
+	"github.com/condemo/pomotui/utils"
+)
+
+var (
+	TimerConfig   = newTimerConfig()
+	GeneralConfig = newGeneralConfig()
+)
 
 type timerConfig struct {
 	Work       time.Duration
@@ -18,8 +31,49 @@ func newTimerConfig() *timerConfig {
 }
 
 func (t timerConfig) Save() error {
-	// TODO: Implementar guardado local
+	f, err := os.Create(GeneralConfig.ConfigFile)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	toJS := struct {
+		Work       string `json:"workTimer"`
+		ShortBreak string `json:"shortBreak"`
+		LongBreak  string `json:"longBreak"`
+	}{
+		t.Work.String(),
+		t.ShortBreak.String(),
+		t.LongBreak.String(),
+	}
+
+	err = json.NewEncoder(f).Encode(toJS)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
-var TimerConfig = newTimerConfig()
+type generalConfig struct {
+	ConfigDir  string
+	ConfigFile string
+}
+
+func newGeneralConfig() *generalConfig {
+	hd, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	configDir := path.Join(hd, ".config/pomotui")
+	err = utils.CheckFolder(configDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &generalConfig{
+		ConfigDir:  configDir,
+		ConfigFile: path.Join(configDir, "config.json"),
+	}
+}

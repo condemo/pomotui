@@ -2,12 +2,14 @@ package views
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/condemo/pomotui/config"
 	"github.com/condemo/pomotui/keymaps"
 	"github.com/condemo/pomotui/style"
 )
@@ -17,7 +19,12 @@ type ConfigView struct {
 	form *huh.Form
 }
 
-var confirmed bool
+var (
+	confirmed  bool
+	workTimer  time.Duration
+	shortTimer time.Duration
+	longTimer  time.Duration
+)
 
 func NewConfig() ConfigView {
 	return ConfigView{
@@ -31,7 +38,7 @@ func NewConfig() ConfigView {
 						huh.NewOption("25m", time.Minute*25),
 						huh.NewOption("30m", time.Minute*30),
 						huh.NewOption("35m", time.Minute*35),
-					).Key("work"),
+					).Key("work").Value(&workTimer),
 				huh.NewSelect[time.Duration]().
 					Title("Short Break").
 					Options(
@@ -39,7 +46,7 @@ func NewConfig() ConfigView {
 						huh.NewOption("4m", time.Minute*4),
 						huh.NewOption("5m", time.Minute*5),
 						huh.NewOption("6m", time.Minute*6),
-					).Key("short"),
+					).Key("short").Value(&shortTimer),
 			).WithWidth(30),
 			huh.NewGroup(
 				huh.NewSelect[time.Duration]().
@@ -49,7 +56,7 @@ func NewConfig() ConfigView {
 						huh.NewOption("15m", time.Minute*15),
 						huh.NewOption("20m", time.Minute*20),
 						huh.NewOption("25m", time.Minute*25),
-					).Key("long"),
+					).Key("long").Value(&longTimer),
 				huh.NewConfirm().
 					Title("Are you sure?").Affirmative("yes!").Negative("no.").
 					Value(&confirmed),
@@ -69,20 +76,35 @@ func (m ConfigView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.form = f
 	}
 
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "enter":
+			if confirmed {
+				config.TimerConfig.Work = workTimer
+				config.TimerConfig.ShortBreak = shortTimer
+				config.TimerConfig.LongBreak = longTimer
+				if err := config.TimerConfig.Save(); err != nil {
+					log.Fatal(err)
+				}
+			}
+		}
+	}
+
 	return m, cmd
 }
 
 func (m ConfigView) View() string {
-	work := m.form.Get("work")
-	short := m.form.Get("short")
-	long := m.form.Get("long")
-
-	currentSelections := fmt.Sprintf("work - %s | short - %s | long - %s", work, short, long)
+	currentSelections := fmt.Sprintf("%+v", config.TimerConfig)
 
 	if m.form.State == huh.StateCompleted {
 		return "Config" + strings.Repeat("\n", 3) + currentSelections
 	}
 
-	view := lipgloss.JoinVertical(lipgloss.Center, "Config", m.form.View())
+	view := lipgloss.JoinVertical(lipgloss.Center,
+		"Config",
+		m.form.View(),
+		fmt.Sprintf("%+v", config.TimerConfig))
+
 	return style.MainContainer.Padding(1, 10, 1, 15).Render(view)
 }
