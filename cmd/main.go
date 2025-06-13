@@ -16,6 +16,7 @@ type Pomotui struct {
 	keys        keymaps.CoreKeyMap
 	views       []tea.Model
 	currentView views.View
+	debugMsg    string
 	help        help.Model
 	quitting    bool
 }
@@ -40,6 +41,13 @@ func (m Pomotui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.help.Width = msg.Width
+	case messages.ConfigCompleted:
+		m.currentView = views.Home
+		m.keys.Home.SetEnabled(false)
+		m.keys.Config.SetEnabled(true)
+		m.views[m.currentView], cmd = m.views[m.currentView].Update(msg)
+		return m, cmd
+
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keys.Config):
@@ -66,7 +74,7 @@ func (m Pomotui) View() string {
 	}
 
 	return lipgloss.JoinVertical(lipgloss.Center,
-		m.views[m.currentView].View(), m.help.View(m.keys))
+		m.views[m.currentView].View(), m.help.View(m.keys), m.debugMsg)
 }
 
 func main() {

@@ -7,3 +7,5 @@ type ViewChanged bool
 func ChangeView() tea.Msg {
 	return ViewChanged(true)
 }
+
+type ConfigCompleted bool

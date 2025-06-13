@@ -102,6 +102,10 @@ func (m HomeView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case messages.ViewChanged:
 		return m, m.timer.Stop()
+
+	case messages.ConfigCompleted:
+		m.timer.Timeout = config.TimerConfig.Work
+		return m, cmd
 	}
 	return m, cmd
 }
@@ -116,9 +120,6 @@ func (m HomeView) View() string {
 }
 
 func (m *HomeView) stop() tea.Cmd {
-	// TODO: mover funcionalidad aquí
-	// m.keys.Pause.SetEnabled(m.timer.Running())
-	// m.keys.Start.SetEnabled(!m.timer.Running())
 	if m.timer.Running() {
 		currentColor = style.WorkColor
 		m.keys.Pause.SetEnabled(true)

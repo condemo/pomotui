@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/condemo/pomotui/config"
 	"github.com/condemo/pomotui/keymaps"
+	"github.com/condemo/pomotui/messages"
 	"github.com/condemo/pomotui/style"
 )
 
@@ -87,6 +88,7 @@ func (m ConfigView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if err := config.TimerConfig.Save(); err != nil {
 					log.Fatal(err)
 				}
+				return m, m.Completed()
 			}
 		}
 	}
@@ -104,7 +106,13 @@ func (m ConfigView) View() string {
 	view := lipgloss.JoinVertical(lipgloss.Center,
 		"Config",
 		m.form.View(),
-		fmt.Sprintf("%+v", config.TimerConfig))
+	)
 
 	return style.MainContainer.Padding(1, 10, 1, 15).Render(view)
+}
+
+func (m ConfigView) Completed() tea.Cmd {
+	return func() tea.Msg {
+		return messages.ConfigCompleted(true)
+	}
 }
