@@ -43,21 +43,18 @@ func (m Pomotui) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.help.Width = msg.Width
 	case messages.ConfigCompleted:
 		m.currentView = views.Home
-		m.keys.Home.SetEnabled(false)
-		m.keys.Config.SetEnabled(true)
+		m.activateConfigKey()
 		m.views[m.currentView], cmd = m.views[m.currentView].Update(msg)
 		return m, cmd
 
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keys.Config):
-			m.keys.Home.SetEnabled(true)
-			m.keys.Config.SetEnabled(false)
+			m.activateHomeKey()
 			m.currentView = views.Config
 			return m, messages.ChangeView
 		case key.Matches(msg, m.keys.Home):
-			m.keys.Home.SetEnabled(false)
-			m.keys.Config.SetEnabled(true)
+			m.activateConfigKey()
 			m.currentView = views.Home
 			return m, messages.ChangeView
 		case key.Matches(msg, m.keys.Quit):
@@ -75,6 +72,16 @@ func (m Pomotui) View() string {
 
 	return lipgloss.JoinVertical(lipgloss.Center,
 		m.views[m.currentView].View(), m.help.View(m.keys), m.debugMsg)
+}
+
+func (m *Pomotui) activateConfigKey() {
+	m.keys.Home.SetEnabled(false)
+	m.keys.Config.SetEnabled(true)
+}
+
+func (m *Pomotui) activateHomeKey() {
+	m.keys.Home.SetEnabled(true)
+	m.keys.Config.SetEnabled(false)
 }
 
 func main() {
