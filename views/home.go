@@ -105,7 +105,7 @@ func (m HomeView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case messages.ConfigCompleted:
 		m.timer.Timeout = config.TimerConfig.Work
-		return m, cmd
+		return m, m.timerProgress.SetPercent(0)
 	}
 	return m, cmd
 }
