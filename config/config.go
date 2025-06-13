@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	TimerConfig   = newTimerConfig()
+	TimerConfig   = newTimerConfig().LoadConfig()
 	GeneralConfig = newGeneralConfig()
 )
 
@@ -22,11 +22,10 @@ type timerConfig struct {
 }
 
 func newTimerConfig() *timerConfig {
-	// TODO: Cargar los datos desde archivo local
 	return &timerConfig{
-		Work:       time.Minute * 1,
-		ShortBreak: time.Minute * 1,
-		LongBreak:  time.Minute * 1,
+		Work:       time.Minute * 25,
+		ShortBreak: time.Minute * 5,
+		LongBreak:  time.Minute * 15,
 	}
 }
 
@@ -53,6 +52,29 @@ func (t timerConfig) Save() error {
 	}
 
 	return nil
+}
+
+func (t *timerConfig) LoadConfig() *timerConfig {
+	f, err := utils.GetConfigFile(GeneralConfig.ConfigFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	fs, err := f.Stat()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if fs.Size() == 0 {
+		return t
+	} else {
+		err = json.NewDecoder(f).Decode(t)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	return t
 }
 
 type generalConfig struct {

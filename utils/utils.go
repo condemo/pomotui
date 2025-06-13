@@ -14,3 +14,18 @@ func CheckFolder(folder string) error {
 	}
 	return nil
 }
+
+func GetConfigFile(p string) (*os.File, error) {
+	if _, err := os.Stat(p); errors.Is(err, os.ErrNotExist) {
+		f, err := os.Create(p)
+		if err != nil {
+			return nil, err
+		}
+		return f, nil
+	}
+	f, err := os.Open(p)
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
+}
