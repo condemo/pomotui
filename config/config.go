@@ -36,7 +36,7 @@ func (t timerConfig) Save() error {
 	}
 	defer f.Close()
 
-	toJS := struct {
+	toJSON := struct {
 		Work       string `json:"workTimer"`
 		ShortBreak string `json:"shortBreak"`
 		LongBreak  string `json:"longBreak"`
@@ -46,7 +46,7 @@ func (t timerConfig) Save() error {
 		t.LongBreak.String(),
 	}
 
-	err = json.NewEncoder(f).Encode(toJS)
+	err = json.NewEncoder(f).Encode(toJSON)
 	if err != nil {
 		return err
 	}
