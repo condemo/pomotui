@@ -15,10 +15,16 @@ var (
 	GeneralConfig = newGeneralConfig()
 )
 
+type toJSON struct {
+	Work       string `json:"workTimer"`
+	ShortBreak string `json:"shortBreak"`
+	LongBreak  string `json:"longBreak"`
+}
+
 type timerConfig struct {
-	Work       time.Duration
-	ShortBreak time.Duration
-	LongBreak  time.Duration
+	Work       time.Duration `json:"workTimer"`
+	ShortBreak time.Duration `json:"shortBreak"`
+	LongBreak  time.Duration `json:"longBreak"`
 }
 
 func newTimerConfig() *timerConfig {
@@ -36,17 +42,13 @@ func (t timerConfig) Save() error {
 	}
 	defer f.Close()
 
-	toJSON := struct {
-		Work       string `json:"workTimer"`
-		ShortBreak string `json:"shortBreak"`
-		LongBreak  string `json:"longBreak"`
-	}{
+	toJS := toJSON{
 		t.Work.String(),
 		t.ShortBreak.String(),
 		t.LongBreak.String(),
 	}
 
-	err = json.NewEncoder(f).Encode(toJSON)
+	err = json.NewEncoder(f).Encode(toJS)
 	if err != nil {
 		return err
 	}
@@ -55,6 +57,7 @@ func (t timerConfig) Save() error {
 }
 
 func (t *timerConfig) LoadConfig() *timerConfig {
+	fromJS := new(toJSON)
 	f, err := utils.GetConfigFile(GeneralConfig.ConfigFile)
 	if err != nil {
 		log.Fatal(err)
@@ -69,10 +72,23 @@ func (t *timerConfig) LoadConfig() *timerConfig {
 	if fs.Size() == 0 {
 		return t
 	} else {
-		err = json.NewDecoder(f).Decode(t)
+		err = json.NewDecoder(f).Decode(fromJS)
 		if err != nil {
 			log.Fatal(err)
 		}
+	}
+
+	t.Work, err = time.ParseDuration(fromJS.Work)
+	if err != nil {
+		log.Fatal(err)
+	}
+	t.ShortBreak, err = time.ParseDuration(fromJS.ShortBreak)
+	if err != nil {
+		log.Fatal(err)
+	}
+	t.LongBreak, err = time.ParseDuration(fromJS.LongBreak)
+	if err != nil {
+		log.Fatal(err)
 	}
 	return t
 }
