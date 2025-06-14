@@ -16,12 +16,6 @@ import (
 )
 
 // TODO: Crear un módulo de configuración para hacer dinámico todo esto
-const (
-	timeout      = time.Minute * 1
-	shortTimeout = time.Minute * 5
-	longTimeout  = time.Minute * 15
-)
-
 type timerMode string
 
 const (
@@ -30,13 +24,13 @@ const (
 	longBreak  timerMode = "Long Break"
 )
 
-// TODO: debería ser todo dinámico, el `incPercent` tiene que ser calculado
-const (
-	incPercent = .0005555
-	maxWidth   = 20
+var (
+	currentTimeout = config.TimerConfig.Work
+	currentColor   = style.MainColor
+	incPercent     = 1 / currentTimeout.Seconds()
 )
 
-var currentColor = style.MainColor
+const maxWidth = 20
 
 type HomeView struct {
 	keys          keymaps.HomeKeyMap
@@ -51,7 +45,7 @@ func NewHomeView() HomeView {
 		keys:      keymaps.NewHomeKeyMap(),
 		help:      help.New(),
 		timerMode: work,
-		timer:     timer.New(config.TimerConfig.Work),
+		timer:     timer.NewWithInterval(config.TimerConfig.Work, time.Second),
 		timerProgress: progress.New(
 			progress.WithDefaultGradient(),
 		),
@@ -60,7 +54,7 @@ func NewHomeView() HomeView {
 
 func (m HomeView) Init() tea.Cmd {
 	m.timer.Init()
-	return m.timer.Stop()
+	return tea.Batch(m.timerProgress.SetPercent(0), m.timer.Stop())
 }
 
 func (m HomeView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -78,9 +72,9 @@ func (m HomeView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.stop()
 
 	case timer.TimeoutMsg:
-		cmd1 := m.timer.Stop()
+		m.timer.Timeout = config.TimerConfig.Work
 		cmd2 := m.timerProgress.SetPercent(0)
-		m.timer.Timeout = timeout
+		cmd1 := m.timer.Stop()
 		return m, tea.Batch(cmd1, cmd2)
 
 	case tea.KeyMsg:
@@ -88,7 +82,7 @@ func (m HomeView) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keys.Start, m.keys.Pause):
 			return m, m.timer.Toggle()
 		case key.Matches(msg, m.keys.Reset):
-			m.timer.Timeout = timeout
+			m.timer.Timeout = config.TimerConfig.Work
 			return m, m.timerProgress.SetPercent(0)
 		}
 	case tea.WindowSizeMsg:
