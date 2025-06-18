@@ -1,8 +1,6 @@
 package messages
 
-import (
-	tea "github.com/charmbracelet/bubbletea"
-)
+import tea "github.com/charmbracelet/bubbletea"
 
 type ViewChanged bool
 
